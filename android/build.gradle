@@ -1,0 +1,45 @@
+group 'tech.shmy.flutter_cling'
+version '1.0'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.1.1'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url 'http://4thline.org/m2'
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 16
+    }
+}
+dependencies {
+    implementation group: 'org.fourthline.cling', name: 'cling-core', version: '2.1.2'
+    implementation group: 'org.fourthline.cling', name: 'cling-support', version: '2.1.2'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-server', version:'8.1.22.v20160922'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version:'8.1.22.v20160922'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-client', version:'8.1.22.v20160922'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
+
+
+}

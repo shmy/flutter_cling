@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.android.AndroidUpnpService;
-import org.fourthline.cling.android.AndroidUpnpServiceImpl;
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Service;
@@ -21,11 +19,16 @@ public class Cling {
     private static AndroidUpnpService androidUpnpService;
     private static ServiceConnection serviceConnection;
     private static final BrowseRegistryListener browseRegistryListener = new BrowseRegistryListener();
+
     public static BrowseRegistryListener getBrowseRegistryListener() {
         return browseRegistryListener;
     }
-    public static void search(Activity activity) {
+
+    public static void start(Activity activity) {
         if (isSearchStarted) {
+            if (androidUpnpService != null) {
+                androidUpnpService.getControlPoint().search();
+            }
             return;
         }
         System.out.println("-----Search start-----");
@@ -36,7 +39,6 @@ public class Cling {
                 androidUpnpService = (AndroidUpnpService) service;
                 System.out.println("A upnpService Connected: " + androidUpnpService.toString());
                 androidUpnpService.getRegistry().addListener(browseRegistryListener);
-                androidUpnpService.getControlPoint().search();
             }
 
             @Override
@@ -48,7 +50,8 @@ public class Cling {
         isSearchStarted = context.getApplicationContext().bindService(new Intent(activity, DLNABrowserService.class),
                 serviceConnection, Context.BIND_AUTO_CREATE);
     }
-    public static void stop(Activity activity) {
+
+    public static void shutdown(Activity activity) {
         if (serviceConnection != null) {
             System.out.println("---Stop search---");
             Context context = activity.getApplicationContext();
@@ -58,6 +61,13 @@ public class Cling {
             browseRegistryListener.clearDevices();
         }
     }
+
+    public static void search() {
+        if (androidUpnpService != null) {
+            androidUpnpService.getControlPoint().search();
+        }
+    }
+
     public static void playUrl(String uuid, String url) {
         final Service avtService = browseRegistryListener.getDeviceByUUID(uuid);
         if (avtService == null) {

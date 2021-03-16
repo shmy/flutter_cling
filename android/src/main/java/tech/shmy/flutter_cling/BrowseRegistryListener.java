@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.model.types.ServiceType;
@@ -83,6 +84,20 @@ public class BrowseRegistryListener extends DefaultRegistryListener {
     private void onRemove(Device device) {
         deviceList.remove(device);
         sendEvent();
+    }
+
+    @Override
+    public void localDeviceAdded(Registry registry, LocalDevice device) {
+        System.out.println("localDeviceAdded: " + device.getDetails().getFriendlyName());
+        onAdded(device);
+        super.localDeviceAdded(registry, device);
+    }
+
+    @Override
+    public void localDeviceRemoved(Registry registry, LocalDevice device) {
+        System.out.println("localDeviceRemoved: " + device.getDetails().getFriendlyName());
+        onRemove(device);
+        super.localDeviceRemoved(registry, device);
     }
 
     @Override

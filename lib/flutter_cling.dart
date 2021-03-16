@@ -1,41 +1,50 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cling/device.dart';
+export 'package:flutter_cling/device.dart';
 
 class FlutterCling {
-  static const CHANNEL_NAME = "tech.shmy.plugins/flutter_cling/";
-  static const MethodChannel methodChannel =
-      const MethodChannel(CHANNEL_NAME + "method");
-  static const EventChannel eventChannel =
-      const EventChannel(CHANNEL_NAME + "event");
-  static StreamSubscription? eventSubscription;
+  static const _CHANNEL_NAME = "tech.shmy.plugins/flutter_cling/";
+  static const MethodChannel _methodChannel =
+      const MethodChannel(_CHANNEL_NAME + "method");
+  static const EventChannel _eventChannel =
+      const EventChannel(_CHANNEL_NAME + "event");
+  static StreamSubscription? _eventSubscription;
 
-  static initialize(cb) {
-    eventSubscription =
-        eventChannel.receiveBroadcastStream().listen((dynamic data) {
-      cb(data);
+  static startWithListener(ValueChanged<List<Device>> listener) {
+    _eventSubscription =
+        _eventChannel.receiveBroadcastStream().listen((dynamic data) {
+      listener(data.map<Device>((e) => Device.formMap(e)).toList());
     });
+    _start();
   }
 
   static dispose() {
-    eventSubscription?.cancel();
+    _shutdown();
+    _eventSubscription?.cancel();
   }
 
-  static Future<List<dynamic>> get devices async {
-    final List<dynamic> devices = await methodChannel.invokeMethod('getList');
-    return devices;
+  static Future<List<Device>> get devices async {
+    final List<dynamic> devices = await _methodChannel.invokeMethod('getDevices');
+    return devices.map((e) => Device.formMap(e)).toList();
+  }
+
+  static _start() async {
+    await _methodChannel.invokeMethod('start');
   }
 
   static search() async {
-    await methodChannel.invokeMethod('search');
+    await _methodChannel.invokeMethod('search');
   }
 
-  static stop() async {
-    await methodChannel.invokeMethod('stop');
+  static _shutdown() async {
+    await _methodChannel.invokeMethod('shutdown');
   }
 
   static playUrl(String uuid, String url) async {
-    await methodChannel.invokeMethod('playUrl', {
+    await _methodChannel.invokeMethod('playUrl', {
       "uuid": uuid,
       "url": url,
     });

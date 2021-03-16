@@ -40,18 +40,20 @@ public class FlutterClingPlugin implements FlutterPlugin, MethodCallHandler, Eve
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         switch (call.method) {
+            case "start":
+                Cling.start(activity);
             case "search":
-                Cling.search(activity);
+                Cling.search();
                 break;
             case "stop":
-                Cling.stop(activity);
+                Cling.shutdown(activity);
                 break;
             case "playUrl":
                 String url = call.argument("url").toString();
                 String uuid = call.argument("uuid").toString();
                 Cling.playUrl(uuid, url);
                 break;
-            case "getList":
+            case "getDevices":
                 result.success(Cling.getBrowseRegistryListener().getDeviceHashList());
                 break;
             default:

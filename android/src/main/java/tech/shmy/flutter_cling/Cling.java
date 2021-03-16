@@ -28,20 +28,20 @@ public class Cling {
         if (isSearchStarted) {
             return;
         }
-        System.out.println("-----serviceConnection-----");
+        System.out.println("-----Search start-----");
         serviceConnection = new ServiceConnection() {
 
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 androidUpnpService = (AndroidUpnpService) service;
-                System.out.println("---got a androidUpnpService-----");
+                System.out.println("A upnpService Connected: " + androidUpnpService.toString());
                 androidUpnpService.getRegistry().addListener(browseRegistryListener);
                 androidUpnpService.getControlPoint().search();
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                System.out.println(name);
+                System.out.println("A upnpService Disconnected: " + name);
             }
         };
         Context context = activity.getApplicationContext();
@@ -50,7 +50,7 @@ public class Cling {
     }
     public static void stop(Activity activity) {
         if (serviceConnection != null) {
-            System.out.println("---stop service---");
+            System.out.println("---Stop search---");
             Context context = activity.getApplicationContext();
             context.getApplicationContext().unbindService(serviceConnection);
             serviceConnection = null;
@@ -63,32 +63,33 @@ public class Cling {
         if (avtService == null) {
             return;
         }
+        System.out.println("Do play url: " + url + ", uuid: " + uuid);
+
         androidUpnpService.getControlPoint().execute(new SetAVTransportURI(avtService, url) {
             @Override
             public void success(ActionInvocation invocation) {
-                System.out.println("setUrl success:--defaultMsg--" + invocation.toString());
+                System.out.println("Set url success: " + invocation.toString());
                 Cling.doPlay(avtService);
             }
 
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-                System.out.println("setUrl err --defaultMsg--" + defaultMsg);
+                System.out.println("Set url error: " + defaultMsg);
             }
         });
 
-        System.out.println(url);
     }
 
     private static void doPlay(Service avtService) {
         androidUpnpService.getControlPoint().execute(new Play(avtService) {
             @Override
             public void success(ActionInvocation invocation) {
-                System.out.println("play success:--defaultMsg--" + invocation.toString());
+                System.out.println("Play success: " + invocation.toString());
             }
 
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-                System.out.println("play err:--defaultMsg--" + defaultMsg);
+                System.out.println("Play error: " + defaultMsg);
             }
         });
     }

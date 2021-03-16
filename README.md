@@ -20,4 +20,4 @@ packagingOptions {
   exclude 'META-INF/beans.xml'
 }
 ```
-[ ] 重复设备
+[x] 重复设备
